@@ -15,6 +15,7 @@ I will update them by adding something new or improving their work.
      
 2. Object Pool
 3. Gun
+4. Health System
 
 ## What will happen next?
 
@@ -23,5 +24,5 @@ I will update them by adding something new or improving their work.
 - Movements
    - [ ] Update First Person
    - [ ] Create Third Person
-- [ ] Update Gun
-- [x] Create Health System
+- [x] Update Gun
+- [ ] Save Progress (to json)
