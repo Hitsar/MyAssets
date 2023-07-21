@@ -26,5 +26,4 @@ In the `Beta` branch you can find assets that are still in development.
 - Movements
    - [ ] Update First Person
    - [ ] Create Third Person
-- [x] Update Gun
-- [ ] Create Save Progress (to json)
+- [x] Create Save Progress (to json)

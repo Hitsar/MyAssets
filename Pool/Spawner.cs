@@ -4,20 +4,20 @@ namespace Pool
 {
     public class Spawner : MonoBehaviour
     {
-        [SerializeField] private GameObject[] _prefabObjects;
+        [SerializeField] private GameObject[] _prefabsObjects;
         [SerializeField] private Transform[] _spawners;
 
-	[SerializeField] GameObject _container;
-	[SerializeField] int _quantity;
-        [SerializeField] private float _minSecondForSpawn, _maxSecondForSpawn;
+	    [SerializeField] private GameObject _container;
+	    [SerializeField] private int _quantity = 1;
+        [SerializeField] private float _minSecondForSpawn = 1, _maxSecondForSpawn = 3;
         
-	private ObjectPool _objectPool;
+	    private ObjectPool _objectPool;
         private float _secondForSpawn;
         private float _time;
 
         private void Start()
         {
-            _objectPool = new ObjectPool(_prefabObjects, _container, _quantity);
+            _objectPool = new ObjectPool(_prefabsObjects, _container, _quantity);
             _secondForSpawn = Random.Range(_minSecondForSpawn, _maxSecondForSpawn);
         }
 
