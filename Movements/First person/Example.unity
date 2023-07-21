@@ -1233,6 +1233,7 @@ MonoBehaviour:
   _jumpForce: 5
   _gravity: -9.81
   _takeDistance: 5
+  _trowForce: 5
   _canPickUpLayer:
     serializedVersion: 2
     m_Bits: 64

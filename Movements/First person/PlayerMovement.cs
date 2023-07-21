@@ -12,6 +12,7 @@ namespace Player
         [SerializeField] private float _gravity = -9.81f;
         
         [SerializeField] private float _takeDistance = 5;
+        [SerializeField] private float _trowForce = 5;
         [SerializeField] private LayerMask _canPickUpLayer;
 
         private PlayerInput _inputSystem;
@@ -22,12 +23,13 @@ namespace Player
         private Vector2 _rotation;
 
         private Rigidbody _currentObject;
-        private bool _isPickUp;
 
         private void Start()
         {
             _inputSystem = new PlayerInput();
             _inputSystem.Player.Jump.performed += _ => Jump();
+            _inputSystem.Player.PickUp.performed += _ => PickUp();
+            _inputSystem.Player.Trow.performed += _ => Drop(true);
             _inputSystem.Player.Enable();
 
             _characterController = GetComponent<CharacterController>();
@@ -61,7 +63,6 @@ namespace Player
             
             else _velocity.y += _gravity * Time.fixedDeltaTime;
             
-            if (_inputSystem.Player.PickUp.WasPressedThisFrame()) PickUp(); 
             if (_inputSystem.Player.PickUp.WasReleasedThisFrame()) Drop(); 
         }
 
@@ -84,12 +85,13 @@ namespace Player
             }
         }
 
-        private void Drop()
+        private void Drop(bool isTrow = false)
         {
             if (_currentObject == null) return;
             
             _currentObject.transform.parent = null;
             _currentObject.isKinematic = false;
+            if (isTrow) _currentObject.AddForce(_playerCamera.transform.forward * _trowForce, ForceMode.Impulse);
             _currentObject = null;
         }
     }
