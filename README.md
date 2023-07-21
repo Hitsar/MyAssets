@@ -6,6 +6,8 @@
 These are my assets that I wrote myself and use in my projects.
 I will update them by adding something new or improving their work.
 
+In the `Beta` branch you can find assets that are still in development.
+
 ## What is there here?
 
 1. Movements
@@ -24,5 +26,4 @@ I will update them by adding something new or improving their work.
 - Movements
    - [ ] Update First Person
    - [ ] Create Third Person
-- [x] Update Gun
-- [ ] Create Save Progress (to json)
+- [x] Create Save Progress (to json)

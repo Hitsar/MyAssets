@@ -1,19 +1,30 @@
+using System.Collections.Generic;
+using Pool;
 using UnityEngine;
 
-public class Gun : BulletPool
+public class Gun : MonoBehaviour
 {
-    [SerializeField] Bullet _bullet;
-    [SerializeField] Transform _spawnPoint;
-    [SerializeField] private float _recharge;
-
+    [SerializeField] private Bullet _bullet;
+    [SerializeField] private Transform _spawnPoint;
+    [SerializeField] private float _recharge = 0.5f;
+    [Header("Pool")]
+    [SerializeField] private GameObject _container;
+    [SerializeField] private int _quantity = 1;
+    
+    private readonly List<Bullet> _pool = new List<Bullet>();
+    
+    private SpriteRenderer _spriteRenderer;
     private InputSystem _inputSystem;
-    private float _time;
+    private ObjectPool _objectPool;
+    
     private Camera _main;
+    private float _time;
 
     private void Start()
     {
-        Initialized(_bullet);
         _main = Camera.main;
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _objectPool = new ObjectPool(_bullet.gameObject, _container, _quantity);
 
         _inputSystem = new InputSystem();
         _inputSystem.Gun.Shoot.performed += _ => Shoot();
@@ -22,20 +33,21 @@ public class Gun : BulletPool
 
     private void FixedUpdate()
     {
-        Vector3 diference = _main.ScreenToWorldPoint(_inputSystem.Gun.ShootDirection.ReadValue<Vector2>()) - transform.position;
-        float rotateZ = Mathf.Atan2(diference.y, diference.x) * Mathf.Rad2Deg;
+        Vector3 difference = _main.ScreenToWorldPoint(_inputSystem.Gun.ShootDirection.ReadValue<Vector2>()) - transform.position;
+        float rotateZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0, 0, rotateZ);
         
         _time -= Time.fixedDeltaTime;
+        _spriteRenderer.flipY = rotateZ >= 90 || rotateZ <= -90;
     }
 
     protected virtual void Shoot()
     {
-        if (_time <= 0 && TryGetObject(out Bullet bullet))
+        if (_time <= 0 && _objectPool.TryGetObject(out GameObject bullet))
         {
-            bullet.transform.position = _spawnPoint.position;
-            bullet.transform.rotation = _spawnPoint.rotation;
-            bullet.gameObject.SetActive(true);
+            bullet.gameObject.transform.position = _spawnPoint.position;
+            bullet.gameObject.transform.rotation = _spawnPoint.rotation;
+            bullet.gameObject.transform.gameObject.SetActive(true);
             _time = _recharge;
         }
     }
