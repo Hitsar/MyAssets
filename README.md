@@ -26,5 +26,4 @@ In the `Beta` branch you can find assets that are still in development.
 - Movements
    - [ ]  Coutch for First Person
    - [ ] Create Third Person
-- [x] Create Save Progress 
 - [x] Create all assets with Input Manager
