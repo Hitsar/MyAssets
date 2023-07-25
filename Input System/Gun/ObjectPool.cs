@@ -28,9 +28,9 @@ namespace Pool
     	{
     	    GameObject spawned = Object.Instantiate(prefab, container.transform);
     
-                spawned.SetActive(false);
+            spawned.SetActive(false);
     
-                _pool.Add(spawned);
+            _pool.Add(spawned);
     	}
     
     	public bool TryGetObject(out GameObject result)
