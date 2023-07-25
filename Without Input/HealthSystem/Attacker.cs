@@ -8,8 +8,7 @@ namespace HealthSystem
         
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.gameObject.TryGetComponent(out IHealthSystem healthSystem))
-                healthSystem.ApplyDamage(_damage);
+            if (other.gameObject.TryGetComponent(out IHealthSystem healthSystem)) healthSystem.ApplyDamage(_damage);
         }
     }
 }

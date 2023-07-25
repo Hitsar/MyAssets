@@ -252,10 +252,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 630102972}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 262ccfe56a11e3749bb1f7ef48d3f453, type: 3}
+  m_Script: {fileID: 11500000, guid: d718dae30e9f3d2489bf315e94bf9180, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _speed: 4
+  _walkSpeed: 3
+  _sprintSpeed: 5.5
+  _couchSpeed: 1.5
+  _jumpForce: 5
+  _dashForce: 10
+  _dashDuration: 0.1
+  _dashCooldown: 1
 --- !u!50 &630102975
 Rigidbody2D:
   serializedVersion: 4

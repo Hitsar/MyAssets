@@ -60,19 +60,15 @@ namespace Player
             if (_isDashing) return;
             
             _direction = _inputSystem.Player.Move.ReadValue<float>();
-            _isSprint = _inputSystem.Player.Sprint.ReadValue<float>() > 0;
-            _isCouching = _inputSystem.Player.Coutch.ReadValue<float>() > 0;
-            
+
             OnMove?.Invoke(_direction == 0);
-            OnSprint?.Invoke(_isSprint);
-            OnCouch?.Invoke(_isCouching);
+            OnSprint?.Invoke(_isSprint = _inputSystem.Player.Sprint.IsPressed());
+            OnCouch?.Invoke(_isCouching = _inputSystem.Player.Coutch.IsPressed());
             
             float scaledDirection = _direction;
 
             if (_isCouching == false && _isSprint) scaledDirection *= _sprintSpeed;
-            
             else if (_isCouching) scaledDirection *= _couchSpeed;
-            
             else scaledDirection *= _walkSpeed;
             
             _rigidbody.velocity = new Vector2(scaledDirection, _rigidbody.velocity.y);

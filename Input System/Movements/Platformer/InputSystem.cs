@@ -47,18 +47,18 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""Sprint"",
-                    ""type"": ""PassThrough"",
+                    ""type"": ""Button"",
                     ""id"": ""f919a102-6f14-4934-a2a5-0d5697fcab53"",
-                    ""expectedControlType"": ""Axis"",
+                    ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
                     ""name"": ""Coutch"",
-                    ""type"": ""PassThrough"",
+                    ""type"": ""Button"",
                     ""id"": ""c7867855-cff1-405f-bd4c-21fc1a69e55d"",
-                    ""expectedControlType"": ""Axis"",
+                    ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -229,6 +229,54 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Gun"",
+            ""id"": ""efa5b252-14bc-4e2a-be94-78606e04440c"",
+            ""actions"": [
+                {
+                    ""name"": ""Shoot"",
+                    ""type"": ""Button"",
+                    ""id"": ""6d18196e-0143-4c66-9897-78f8d045c992"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ShootDirection"",
+                    ""type"": ""Value"",
+                    ""id"": ""7107a7ec-68d6-4c3b-8b68-458551059958"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""e97017a5-8543-431e-b9a5-cf7dc80658b8"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Shoot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0f3e511d-57a3-47c0-a181-3ddd8c30601e"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShootDirection"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -240,6 +288,10 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Coutch = m_Player.FindAction("Coutch", throwIfNotFound: true);
         m_Player_Dash = m_Player.FindAction("Dash", throwIfNotFound: true);
+        // Gun
+        m_Gun = asset.FindActionMap("Gun", throwIfNotFound: true);
+        m_Gun_Shoot = m_Gun.FindAction("Shoot", throwIfNotFound: true);
+        m_Gun_ShootDirection = m_Gun.FindAction("ShootDirection", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -375,6 +427,60 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // Gun
+    private readonly InputActionMap m_Gun;
+    private List<IGunActions> m_GunActionsCallbackInterfaces = new List<IGunActions>();
+    private readonly InputAction m_Gun_Shoot;
+    private readonly InputAction m_Gun_ShootDirection;
+    public struct GunActions
+    {
+        private @InputSystem m_Wrapper;
+        public GunActions(@InputSystem wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Shoot => m_Wrapper.m_Gun_Shoot;
+        public InputAction @ShootDirection => m_Wrapper.m_Gun_ShootDirection;
+        public InputActionMap Get() { return m_Wrapper.m_Gun; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(GunActions set) { return set.Get(); }
+        public void AddCallbacks(IGunActions instance)
+        {
+            if (instance == null || m_Wrapper.m_GunActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_GunActionsCallbackInterfaces.Add(instance);
+            @Shoot.started += instance.OnShoot;
+            @Shoot.performed += instance.OnShoot;
+            @Shoot.canceled += instance.OnShoot;
+            @ShootDirection.started += instance.OnShootDirection;
+            @ShootDirection.performed += instance.OnShootDirection;
+            @ShootDirection.canceled += instance.OnShootDirection;
+        }
+
+        private void UnregisterCallbacks(IGunActions instance)
+        {
+            @Shoot.started -= instance.OnShoot;
+            @Shoot.performed -= instance.OnShoot;
+            @Shoot.canceled -= instance.OnShoot;
+            @ShootDirection.started -= instance.OnShootDirection;
+            @ShootDirection.performed -= instance.OnShootDirection;
+            @ShootDirection.canceled -= instance.OnShootDirection;
+        }
+
+        public void RemoveCallbacks(IGunActions instance)
+        {
+            if (m_Wrapper.m_GunActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IGunActions instance)
+        {
+            foreach (var item in m_Wrapper.m_GunActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_GunActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public GunActions @Gun => new GunActions(this);
     public interface IPlayerActions
     {
         void OnMove(InputAction.CallbackContext context);
@@ -382,5 +488,10 @@ public partial class @InputSystem: IInputActionCollection2, IDisposable
         void OnSprint(InputAction.CallbackContext context);
         void OnCoutch(InputAction.CallbackContext context);
         void OnDash(InputAction.CallbackContext context);
+    }
+    public interface IGunActions
+    {
+        void OnShoot(InputAction.CallbackContext context);
+        void OnShootDirection(InputAction.CallbackContext context);
     }
 }

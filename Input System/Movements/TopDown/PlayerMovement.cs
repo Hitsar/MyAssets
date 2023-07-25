@@ -25,7 +25,7 @@ namespace Player
              _direction = _inputSystem.Player.Move.ReadValue<Vector2>();
              Vector2 scaledDirection = _direction;
 
-             scaledDirection *= _inputSystem.Player.Sprint.ReadValue<float>() > 0 ? _sprintSpeed : _walkSpeed;
+             scaledDirection *= _inputSystem.Player.Sprint.IsPressed() ? _sprintSpeed : _walkSpeed;
             
              _rigidbody.velocity = scaledDirection;
         }    
