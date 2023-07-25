@@ -1,0 +1,65 @@
+{
+    "name": "InputSystem",
+    "maps": [
+        {
+            "name": "Gun",
+            "id": "2283d8e5-f87f-4e94-8dce-227c556bc61f",
+            "actions": [
+                {
+                    "name": "Shoot",
+                    "type": "Button",
+                    "id": "cb2797cd-0552-4c94-96d4-bba50b17b3b3",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "ShootDirection",
+                    "type": "Value",
+                    "id": "b48ff3f9-ca7f-41fb-8162-16d5e0ecbc77",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "dc648332-4301-44b2-9d16-4b32ec4bcda0",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8450d36d-689c-4782-a921-8418f128b76b",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ShootDirection",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "5020b515-dfde-4f57-a8c6-ebcdba8b8386",
+                    "path": "<Touchscreen>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ShootDirection",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
