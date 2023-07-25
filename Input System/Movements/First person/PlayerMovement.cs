@@ -11,12 +11,11 @@ namespace Player
         [SerializeField] private float _jumpForce = 5;
         [SerializeField] private float _gravity = -9.81f;
         
-        [SerializeField] private float _takeDistance = 5;
+        [SerializeField] private float _pickUpDistance = 5;
         [SerializeField] private float _trowForce = 6;
-        [SerializeField] private Joint _joint;
         [SerializeField] private LayerMask _canPickUpLayer;
 
-        private PlayerInput _inputSystem;
+        private InputSystem _inputSystem;
         private CharacterController _characterController;
         private Collider _playerCollider;
         private Camera _playerCamera;
@@ -24,12 +23,13 @@ namespace Player
         private Vector3 _velocity;
         private Vector2 _rotation;
 
+        private Joint _joint;
         private Rigidbody _currentRigidbodyObject;
         private Collider _currentColliderObject;
 
         private void Start()
         {
-            _inputSystem = new PlayerInput();
+            _inputSystem = new InputSystem();
             _inputSystem.Player.Jump.performed += _ => Jump();
             _inputSystem.Player.PickUp.performed += _ => PickUp();
             _inputSystem.Player.PickUp.canceled += _ => Drop();
@@ -39,6 +39,7 @@ namespace Player
             _characterController = GetComponent<CharacterController>();
             _playerCollider = GetComponent<Collider>();
             _playerCamera = GetComponentInChildren<Camera>();
+            _joint = GetComponentInChildren<Joint>();
             
             Cursor.lockState = CursorLockMode.Locked;
         }
@@ -68,22 +69,19 @@ namespace Player
             else _velocity.y += _gravity * Time.fixedDeltaTime;
         }
 
-        private void Jump() { if (_characterController.isGrounded) _velocity = Vector3.up * _jumpForce; }
+        private void Jump() { if (_characterController.isGrounded) _velocity.y = _jumpForce; }
 
         private void PickUp()
         {
-            if (!Physics.Raycast(_playerCamera.transform.position, _playerCamera.transform.forward, out RaycastHit hit, _takeDistance, _canPickUpLayer)) return;
+            if (!Physics.Raycast(_playerCamera.transform.position, _playerCamera.transform.forward, out RaycastHit hit, _pickUpDistance, _canPickUpLayer)) return;
             
             _currentRigidbodyObject = hit.collider.gameObject.GetComponent<Rigidbody>();
             _currentColliderObject = _currentRigidbodyObject.GetComponent<Collider>();
-
-            float distance = Vector3.Distance(_playerCamera.transform.position, hit.collider.gameObject.transform.position);
             
             Physics.IgnoreCollision(_playerCollider, _currentColliderObject);
-            _currentRigidbodyObject.drag = 10;
+            _currentRigidbodyObject.drag = 15;
             
-            _joint.gameObject.transform.localPosition = default;
-            _joint.gameObject.transform.localPosition += Vector3.forward * distance;
+            _joint.gameObject.transform.position = _currentRigidbodyObject.gameObject.transform.position;
             _joint.connectedBody = _currentRigidbodyObject;
         }
 
@@ -93,7 +91,7 @@ namespace Player
             
             _joint.connectedBody = null;
             
-            _currentRigidbodyObject.velocity = Vector3.zero;
+            _currentRigidbodyObject.velocity = _velocity;
             if (isTrow) _currentRigidbodyObject.AddForce(_playerCamera.transform.forward * _trowForce, ForceMode.Impulse);
             _currentRigidbodyObject.drag = 0;
             
