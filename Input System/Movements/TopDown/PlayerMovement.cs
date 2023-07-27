@@ -31,12 +31,9 @@ namespace Player
         {
             if (_isDashing) return;
             
-             //Vector2 direction = _inputSystem.Player.Move.ReadValue<Vector2>();
-             //Vector2 scaledDirection = direction;
-
-             //scaledDirection *= _inputSystem.Player.Sprint.IsPressed() ? _sprintSpeed : _walkSpeed;
-            
-             _rigidbody.velocity = _inputSystem.Player.Move.ReadValue<Vector2>() *= _inputSystem.Player.Sprint.IsPressed() ? _sprintSpeed : _walkSpeed;;
+             Vector2 direction = _inputSystem.Player.Move.ReadValue<Vector2>();
+             direction *= _inputSystem.Player.Sprint.IsPressed() ? _sprintSpeed : _walkSpeed;
+             _rigidbody.velocity = direction;
         }
 
         private IEnumerator Dash()
