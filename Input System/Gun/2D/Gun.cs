@@ -38,9 +38,10 @@ namespace Gun
             Vector3 difference = _main.ScreenToWorldPoint(_inputSystem.Gun.ShootDirection.ReadValue<Vector2>()) - transform.position;
             float rotateZ = Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.Euler(0, 0, rotateZ);
-        
+
             _time -= Time.fixedDeltaTime;
             _spriteRenderer.flipY = rotateZ >= 90 || rotateZ <= -90;
+            transform.localScale = transform.parent.localScale.x == -1 ? Vector2.left + Vector2.up: Vector2.one;
         }
 
         protected virtual void Shoot()
