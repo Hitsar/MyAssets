@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace Player
 {
-    [RequireComponent(typeof(Rigidbody2D))]
     public class PlayerMovement : MonoBehaviour
     {
         [SerializeField] private float _walkSpeed = 4;
@@ -12,32 +11,21 @@ namespace Player
         [SerializeField] private float _dashDuration = 0.1f;
         [SerializeField] private float _dashCooldown = 1;
 
+        private Vector2 _direction;
         private Rigidbody2D _rigidbody;
-        private InputSystem _inputSystem;
 
         private bool _canDashing = true;
         private bool _isDashing;
 
-        private void Start()
-        {
-            _rigidbody = GetComponent<Rigidbody2D>();
-            
-            _inputSystem = new InputSystem();
-            _inputSystem.Player.Dash.performed += _ => StartCoroutine(Dash());
-            _inputSystem.Player.Enable();
-        }
-        
-        private void FixedUpdate()
-        {
-            if (_isDashing) return;
-            
-             //Vector2 direction = _inputSystem.Player.Move.ReadValue<Vector2>();
-             //Vector2 scaledDirection = direction;
+        private void Start() => _rigidbody = GetComponent<Rigidbody2D>();
 
-             //scaledDirection *= _inputSystem.Player.Sprint.IsPressed() ? _sprintSpeed : _walkSpeed;
-            
-             _rigidbody.velocity = _inputSystem.Player.Move.ReadValue<Vector2>() *= _inputSystem.Player.Sprint.IsPressed() ? _sprintSpeed : _walkSpeed;;
+        private void Update()
+        {
+            _direction = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+            if (Input.GetKey(KeyCode.Space)) StartCoroutine(Dash());
         }
+
+        private void FixedUpdate() { if (!_isDashing) _rigidbody.velocity = _direction *= Input.GetKey(KeyCode.LeftShift) ? _sprintSpeed : _walkSpeed; }
 
         private IEnumerator Dash()
         {
