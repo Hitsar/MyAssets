@@ -7,7 +7,7 @@ namespace Player
     {
         [SerializeField] private float _walkSpeed = 5;
         [SerializeField] private float _runSpeed = 8;
-        [SerializeField] private float _rotateSpeed = 10;
+        [SerializeField] private float _rotateSpeed = 75;
         [SerializeField] private float _jumpForce = 5;
         [SerializeField] private float _gravity = -9.81f;
         
@@ -15,13 +15,13 @@ namespace Player
         [SerializeField] private float _trowForce = 6;
         [SerializeField] private LayerMask _canPickUpLayer;
 
-        private InputSystem _inputSystem;
         private CharacterController _characterController;
         private Collider _playerCollider;
         private Camera _playerCamera;
 
         private Vector3 _velocity;
         private Vector2 _rotation;
+        private Vector2 _direction;
 
         private Joint _joint;
         private Rigidbody _currentRigidbodyObject;
@@ -29,13 +29,6 @@ namespace Player
 
         private void Start()
         {
-            _inputSystem = new InputSystem();
-            _inputSystem.Player.Jump.performed += _ => Jump();
-            _inputSystem.Player.PickUp.performed += _ => PickUp();
-            _inputSystem.Player.PickUp.canceled += _ => Drop();
-            _inputSystem.Player.Trow.performed += _ => Drop(true);
-            _inputSystem.Player.Enable();
-
             _characterController = GetComponent<CharacterController>();
             _playerCollider = GetComponent<Collider>();
             _playerCamera = GetComponentInChildren<Camera>();
@@ -43,14 +36,21 @@ namespace Player
             
             Cursor.lockState = CursorLockMode.Locked;
         }
-        
+
         private void Update()
         {
             _characterController.Move(_velocity * Time.deltaTime);
             
-            Vector2 mouseDelta = _inputSystem.Player.Look.ReadValue<Vector2>();
-            if (rotate.sqrMagnitude < 0.1f) return;
+            _direction = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+            Vector2 mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
 
+            if (_characterController.isGrounded) _velocity.y = Input.GetKeyDown(KeyCode.Space) ? _jumpForce : -0.1f;
+            else _velocity.y += _gravity * Time.deltaTime;
+            
+            if (Input.GetMouseButtonDown(0)) PickUp();
+            if (Input.GetMouseButtonUp(0)) Drop();
+            if (Input.GetMouseButtonDown(1)) Drop(true);
+            
             mouseDelta *= _rotateSpeed * Time.deltaTime;
             _rotation.y += mouseDelta.x;
             _rotation.x = Mathf.Clamp(_rotation.x - mouseDelta.y, -90, 90);
@@ -59,18 +59,11 @@ namespace Player
 
         private void FixedUpdate()
         {
-            Vector2 direction = _inputSystem.Player.Move.ReadValue<Vector2>();
-            
-            direction *= _inputSystem.Player.Sprint.IsPressed() ? _runSpeed : _walkSpeed;
-            Vector3 move = Quaternion.Euler(0, _playerCamera.transform.eulerAngles.y, 0) * new Vector3(direction.x, 0, direction.y);
+            _direction *= Input.GetKey(KeyCode.LeftShift) ? _runSpeed : _walkSpeed;
+            Vector3 move = Quaternion.Euler(0, _playerCamera.transform.eulerAngles.y, 0) * new Vector3(_direction.x, 0, _direction.y);
             _velocity = new Vector3(move.x, _velocity.y, move.z);
-            
-            if (_characterController.isGrounded) _velocity.y = -0.1f;
-            else _velocity.y += _gravity * Time.fixedDeltaTime;
         }
-
-        private void Jump() { if (_characterController.isGrounded) _velocity.y = _jumpForce; }
-
+        
         private void PickUp()
         {
             if (!Physics.Raycast(_playerCamera.transform.position, _playerCamera.transform.forward, out RaycastHit hit, _pickUpDistance, _canPickUpLayer)) return;
