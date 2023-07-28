@@ -6,7 +6,7 @@ namespace Player
     public class PlayerMovement : MonoBehaviour
     {
         [SerializeField] private float _walkSpeed = 4;
-        [SerializeField] private float _sprintSpeed = 6;
+        [SerializeField] private float _runSpeed = 6;
         [SerializeField] private float _dashForce = 6;
         [SerializeField] private float _dashDuration = 0.1f;
         [SerializeField] private float _dashCooldown = 1;
@@ -22,14 +22,14 @@ namespace Player
         private void Update()
         {
             _direction = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-            if (Input.GetKey(KeyCode.Space)) StartCoroutine(Dash());
+            if (Input.GetKeyDown(KeyCode.Space)) StartCoroutine(Dash());
         }
 
-        private void FixedUpdate() { if (!_isDashing) _rigidbody.velocity = _direction *= Input.GetKey(KeyCode.LeftShift) ? _sprintSpeed : _walkSpeed; }
+        private void FixedUpdate() { if (!_isDashing) _rigidbody.velocity = _direction *= Input.GetKey(KeyCode.LeftShift) ? _runSpeed : _walkSpeed; }
 
         private IEnumerator Dash()
         {
-            if (_canDashing == false) yield break;
+            if (!_canDashing) yield break;
             
             _canDashing = false;
             _isDashing = true;
