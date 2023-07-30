@@ -254,7 +254,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _bullet: {fileID: 6021432115567849788, guid: 434901278091b6641b0f5d608e31df4a, type: 3}
   _spawnPoint: {fileID: 1405084905}
-  _recharge: 0.5
+  _rateOfFire: 0.5
+  _recharge: 3
+  _maxClip: 20
+  _isMachineGun: 1
   _container: {fileID: 1460434261}
   _quantity: 10
 --- !u!1 &1460434261
