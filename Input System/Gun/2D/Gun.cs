@@ -15,7 +15,7 @@ namespace Gun
         [SerializeField] private int _maxClip = 20;
         [SerializeField] private bool _isMachineGun;
         [Header("Pool")]
-        [SerializeField] private GameObject _container;
+        [SerializeField] private Transform _container;
         [SerializeField] private int _quantity = 1;
     
         private readonly List<Bullet> _pool = new List<Bullet>();

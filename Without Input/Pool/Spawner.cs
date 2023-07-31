@@ -7,7 +7,7 @@ namespace Pool
         [SerializeField] private GameObject[] _prefabsObjects;
         [SerializeField] private Transform[] _spawners;
 
-	    [SerializeField] private GameObject _container;
+	    [SerializeField] private Transform _container;
 	    [SerializeField] private int _quantity = 1;
         [SerializeField] private float _minSecondForSpawn = 1, _maxSecondForSpawn = 3;
         

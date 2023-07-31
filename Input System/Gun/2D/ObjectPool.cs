@@ -8,13 +8,13 @@ namespace Pool
     {
         private readonly List<GameObject> _pool = new List<GameObject>();
     
-        public ObjectPool(GameObject prefab, GameObject container, int quantity)
+        public ObjectPool(GameObject prefab, Transform container, int quantity)
         {
             for (int i = 0; i < quantity; i++) 
     	        CreateObject(prefab, container);
         }
     
-        public ObjectPool(GameObject[] prefabs, GameObject container, int quantity)
+        public ObjectPool(GameObject[] prefabs, Transform container, int quantity)
         {
             for (int i = 0; i < quantity; i++)
             {
@@ -24,9 +24,9 @@ namespace Pool
             }
         }
     
-    	private void CreateObject(GameObject prefab, GameObject container)
+    	private void CreateObject(GameObject prefab, Transform container)
     	{
-    	    GameObject spawned = Object.Instantiate(prefab, container.transform);
+    	    GameObject spawned = Object.Instantiate(prefab, container);
     
             spawned.SetActive(false);
     
