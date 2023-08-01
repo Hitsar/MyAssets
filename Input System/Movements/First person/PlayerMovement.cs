@@ -49,7 +49,7 @@ namespace Player
             _characterController.Move(_velocity * Time.deltaTime);
             
             Vector2 mouseDelta = _inputSystem.Player.Look.ReadValue<Vector2>();
-            if (rotate.sqrMagnitude < 0.1f) return;
+            if (mouseDelta.sqrMagnitude < 0.1f) return;
 
             mouseDelta *= _rotateSpeed * Time.deltaTime;
             _rotation.y += mouseDelta.x;
