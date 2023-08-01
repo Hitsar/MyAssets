@@ -78,14 +78,14 @@ namespace Player
             _joint.connectedBody = _currentRigidbodyObject;
         }
 
-        private void Drop(bool isTrow = false)
+        private void Drop(bool isThrow = false)
         {
             if (_currentRigidbodyObject == null) return;
             
             _joint.connectedBody = null;
             
             _currentRigidbodyObject.velocity = _velocity;
-            if (isTrow) _currentRigidbodyObject.AddForce(_playerCamera.transform.forward * _trowForce, ForceMode.Impulse);
+            if (isThrow) _currentRigidbodyObject.AddForce(_playerCamera.transform.forward * _trowForce, ForceMode.Impulse);
             _currentRigidbodyObject.drag = 0;
             
             Physics.IgnoreCollision(_playerCollider, _currentColliderObject, false);
