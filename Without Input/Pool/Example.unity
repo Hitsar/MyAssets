@@ -159,7 +159,7 @@ MonoBehaviour:
   - {fileID: 8182736435714442988, guid: db9795ecbd2041e6b92b23d1d1b1071e, type: 3}
   _spawners:
   - {fileID: 480239953}
-  _container: {fileID: 480239951}
+  _container: {fileID: 480239953}
   _quantity: 10
   _minSecondForSpawn: 1
   _maxSecondForSpawn: 3

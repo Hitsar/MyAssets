@@ -13,7 +13,7 @@ In the `Beta` branch you can find assets that are still in development.
 1. Movements
    - Platformer
    - TopDown
-   - First Person
+   - First Person (with multithreading)
      
 2. Object Pool
 3. Gun

@@ -1328,7 +1328,6 @@ MonoBehaviour:
   _gravity: -9.81
   _pickUpDistance: 5
   _trowForce: 5
-  _joint: {fileID: 1183142759}
   _canPickUpLayer:
     serializedVersion: 2
     m_Bits: 64

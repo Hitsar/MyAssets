@@ -1,3 +1,6 @@
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 
 namespace Player
@@ -22,6 +25,8 @@ namespace Player
 
         private Vector3 _velocity;
         private Vector2 _rotation;
+        private NativeArray<Vector2> _outputCamera;
+        private NativeArray<Vector3> _outputVelocity;
 
         private Joint _joint;
         private Rigidbody _currentRigidbodyObject;
@@ -41,30 +46,50 @@ namespace Player
             _playerCamera = GetComponentInChildren<Camera>();
             _joint = GetComponentInChildren<Joint>();
             
+            _outputCamera = new NativeArray<Vector2>( 2, Allocator.Persistent); 
+            _outputVelocity = new NativeArray<Vector3>(2, Allocator.Persistent);
+            
             Cursor.lockState = CursorLockMode.Locked;
         }
-        
+
         private void Update()
         {
-            _characterController.Move(_velocity * Time.deltaTime);
-            
-            Vector2 mouseDelta = _inputSystem.Player.Look.ReadValue<Vector2>();
-            if (mouseDelta.sqrMagnitude < 0.1f) return;
+            NativeArray<JobHandle> jobs = new NativeArray<JobHandle>(2, Allocator.Temp);
 
-            mouseDelta *= _rotateSpeed * Time.deltaTime;
-            _rotation.y += mouseDelta.x;
-            _rotation.x = Mathf.Clamp(_rotation.x - mouseDelta.y, -90, 90);
+            _outputCamera[0] = _rotation;
+            _outputVelocity[0] = _velocity;
+
+            CameraRotateCalculation cameraRotateCalculation = new CameraRotateCalculation
+            {
+                Rotation = _outputCamera,
+                DeltaTime = Time.deltaTime,
+                MouseDelta = _inputSystem.Player.Look.ReadValue<Vector2>(),
+                RotateSpeed = _rotateSpeed
+            };
+            VelocityCalculation velocityCalculation = new VelocityCalculation
+            {
+                Velocity = _outputVelocity,
+                WalkSpeed = _walkSpeed,
+                RunSpeed = _runSpeed,
+                CameraAnglesY = _playerCamera.transform.localEulerAngles.y,
+                Direction = _inputSystem.Player.Move.ReadValue<Vector2>(),
+                IsSprint = _inputSystem.Player.Sprint.IsPressed()
+            };
+
+            jobs[0] = cameraRotateCalculation.Schedule();
+            jobs[1] = velocityCalculation.Schedule();
+            JobHandle.CompleteAll(jobs);
+
+            _rotation = _outputCamera[1];
+            _velocity = _outputVelocity[1];
+            
+
             _playerCamera.transform.localEulerAngles = _rotation;
+            _characterController.Move(_velocity * Time.deltaTime);
         }
 
         private void FixedUpdate()
         {
-            Vector2 direction = _inputSystem.Player.Move.ReadValue<Vector2>();
-            
-            direction *= _inputSystem.Player.Sprint.IsPressed() ? _runSpeed : _walkSpeed;
-            Vector3 move = Quaternion.Euler(0, _playerCamera.transform.eulerAngles.y, 0) * new Vector3(direction.x, 0, direction.y);
-            _velocity = new Vector3(move.x, _velocity.y, move.z);
-            
             if (_characterController.isGrounded) _velocity.y = -0.1f;
             else _velocity.y += _gravity * Time.fixedDeltaTime;
         }
@@ -90,14 +115,66 @@ namespace Player
             if (_currentRigidbodyObject == null) return;
             
             _joint.connectedBody = null;
-            
+
+            _currentRigidbodyObject.drag = 0;
             _currentRigidbodyObject.velocity = _velocity;
             if (isThrow) _currentRigidbodyObject.AddForce(_playerCamera.transform.forward * _trowForce, ForceMode.Impulse);
-            _currentRigidbodyObject.drag = 0;
-            
+
             Physics.IgnoreCollision(_playerCollider, _currentColliderObject, false);
             
             _currentRigidbodyObject = null;
         }
+
+        private void OnDestroy()
+        {
+            _inputSystem.Player.Jump.performed -= _ => Jump();
+            _inputSystem.Player.PickUp.performed -= _ => PickUp();
+            _inputSystem.Player.PickUp.canceled -= _ => Drop();
+            _inputSystem.Player.Trow.performed -= _ => Drop(true);
+            _inputSystem.Player.Disable();
+            
+            _outputCamera.Dispose();
+            _outputVelocity.Dispose();
+        }
+    }
+}
+
+[BurstCompile]
+public struct CameraRotateCalculation : IJob
+{
+    [ReadOnly] public float DeltaTime;
+    [ReadOnly] public Vector2 MouseDelta;
+    [ReadOnly] public float RotateSpeed;
+    public NativeArray<Vector2> Rotation;
+
+    public void Execute()
+    {
+        Vector2 rotation = Rotation[0];
+        if (MouseDelta.sqrMagnitude < 0.1f) return;
+
+        MouseDelta *= RotateSpeed * DeltaTime;
+        rotation.y += MouseDelta.x;
+        rotation.x = Mathf.Clamp(rotation.x - MouseDelta.y, -90, 90);
+        Rotation[1] = rotation;
+    }
+}
+
+[BurstCompile]
+public struct VelocityCalculation : IJob
+{
+    [ReadOnly] public float WalkSpeed;
+    [ReadOnly] public float RunSpeed;
+    [ReadOnly] public float CameraAnglesY;
+    [ReadOnly] public bool IsSprint;
+    [ReadOnly] public Vector2 Direction;
+    public NativeArray<Vector3> Velocity;
+    
+    public void Execute()
+    {
+        Vector3 velocity = Velocity[0];
+        Direction *= IsSprint ? RunSpeed : WalkSpeed;
+        Vector3 move = Quaternion.Euler(0, CameraAnglesY, 0) * new Vector3(Direction.x, 0, Direction.y);
+        velocity = new Vector3(move.x, velocity.y, move.z);
+        Velocity[1] = velocity;
     }
 }

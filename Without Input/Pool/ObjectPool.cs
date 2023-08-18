@@ -41,15 +41,12 @@ namespace Pool
     
         public bool TryGetRandomObject(out GameObject result)
         {
-            int verifiedObjects = 0;
-            while (true)
+            for (int i = 0; i <= _pool.Count; i++)
             {
                 result = _pool[Random.Range(0, _pool.Count)];
                 if (result.activeSelf == false) return result;
-                
-                verifiedObjects++;
-                if (verifiedObjects >= _pool.Count) {return result == null;}
             }
+            return result = null;
         }
     }
 }
