@@ -136,45 +136,45 @@ namespace Player
             _outputCamera.Dispose();
             _outputVelocity.Dispose();
         }
-    }
-}
+        
+        [BurstCompile]
+        struct CameraRotateCalculation : IJob
+        {
+            [ReadOnly] public float DeltaTime;
+            [ReadOnly] public Vector2 MouseDelta;
+            [ReadOnly] public float RotateSpeed;
+            public NativeArray<Vector2> Rotation;
 
-[BurstCompile]
-public struct CameraRotateCalculation : IJob
-{
-    [ReadOnly] public float DeltaTime;
-    [ReadOnly] public Vector2 MouseDelta;
-    [ReadOnly] public float RotateSpeed;
-    public NativeArray<Vector2> Rotation;
+            public void Execute()
+            {
+                Vector2 rotation = Rotation[0];
+                if (MouseDelta.sqrMagnitude < 0.1f) return;
 
-    public void Execute()
-    {
-        Vector2 rotation = Rotation[0];
-        if (MouseDelta.sqrMagnitude < 0.1f) return;
+                MouseDelta *= RotateSpeed * DeltaTime;
+                rotation.y += MouseDelta.x;
+                rotation.x = Mathf.Clamp(rotation.x - MouseDelta.y, -90, 90);
+                Rotation[1] = rotation;
+            }
+        }
 
-        MouseDelta *= RotateSpeed * DeltaTime;
-        rotation.y += MouseDelta.x;
-        rotation.x = Mathf.Clamp(rotation.x - MouseDelta.y, -90, 90);
-        Rotation[1] = rotation;
-    }
-}
-
-[BurstCompile]
-public struct VelocityCalculation : IJob
-{
-    [ReadOnly] public float WalkSpeed;
-    [ReadOnly] public float RunSpeed;
-    [ReadOnly] public float CameraAnglesY;
-    [ReadOnly] public bool IsSprint;
-    [ReadOnly] public Vector2 Direction;
-    public NativeArray<Vector3> Velocity;
+        [BurstCompile]
+        struct VelocityCalculation : IJob
+        {
+            [ReadOnly] public float WalkSpeed;
+            [ReadOnly] public float RunSpeed;
+            [ReadOnly] public float CameraAnglesY;
+            [ReadOnly] public bool IsSprint;
+            [ReadOnly] public Vector2 Direction;
+            public NativeArray<Vector3> Velocity;
     
-    public void Execute()
-    {
-        Vector3 velocity = Velocity[0];
-        Direction *= IsSprint ? RunSpeed : WalkSpeed;
-        Vector3 move = Quaternion.Euler(0, CameraAnglesY, 0) * new Vector3(Direction.x, 0, Direction.y);
-        velocity = new Vector3(move.x, velocity.y, move.z);
-        Velocity[1] = velocity;
+            public void Execute()
+            {
+                Vector3 velocity = Velocity[0];
+                Direction *= IsSprint ? RunSpeed : WalkSpeed;
+                Vector3 move = Quaternion.Euler(0, CameraAnglesY, 0) * new Vector3(Direction.x, 0, Direction.y);
+                velocity = new Vector3(move.x, velocity.y, move.z);
+                Velocity[1] = velocity;
+            }
+        }
     }
 }
