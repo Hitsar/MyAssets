@@ -11,9 +11,7 @@ namespace Player
         [SerializeField] private float _trowForce = 7;
         [SerializeField] private float _pickUpDistance = 5;
         [SerializeField] private LayerMask _canPickUpLayer;
-        [Space]
         [SerializeField] private Collider _playerCollider;
-        [SerializeField] private Transform _eyes;
         
         private InputSystem _inputSystem;
         private CancellationTokenSource _cancellationToken;
@@ -33,7 +31,7 @@ namespace Player
 
         private void PickUp(InputAction.CallbackContext _)
         {
-            if (!Physics.Raycast(_eyes.position, _eyes.forward, out RaycastHit hit, _pickUpDistance, _canPickUpLayer)) return;
+            if (!Physics.Raycast(transform.parent.position, transform.parent.forward, out RaycastHit hit, _pickUpDistance, _canPickUpLayer)) return;
             
             _currentColliderObject = hit.collider;
             _currentRigidbodyObject = _currentColliderObject.gameObject.GetComponent<Rigidbody>();
@@ -58,7 +56,7 @@ namespace Player
             _currentRigidbodyObject.collisionDetectionMode = CollisionDetectionMode.Discrete;
             _currentRigidbodyObject.useGravity = true;
             
-            if (isThrow) _currentRigidbodyObject.AddForce(_eyes.forward * _trowForce, ForceMode.Impulse);
+            if (isThrow) _currentRigidbodyObject.AddForce(transform.parent.forward * _trowForce, ForceMode.Impulse);
 
             Physics.IgnoreCollision(_playerCollider, _currentColliderObject, false);
             _currentRigidbodyObject = null;

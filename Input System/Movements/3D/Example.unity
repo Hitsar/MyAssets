@@ -759,8 +759,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1183142757}
-  m_LocalRotation: {x: -0, y: 0.98190916, z: -0, w: 0.18935256}
-  m_LocalPosition: {x: 0, y: 0.100000024, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -786,7 +786,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   _playerCollider: {fileID: 1758709926}
-  _eyes: {fileID: 223063124}
 --- !u!1 &1189083600
 GameObject:
   m_ObjectHideFlags: 0
@@ -1238,7 +1237,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80d854c7eb9a4189b7d5d90eddf7efa5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useJobs: 0
   _walkSpeed: 5
   _runSpeed: 8
   _rotateSpeed: 15

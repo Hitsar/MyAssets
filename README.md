@@ -1,6 +1,6 @@
 # More detailed
 ### Please, if you show them to someone, tell them the author :3
-### Unity 2021.3.25f1+
+### Assets for Unity 2021.3.25f1+
 
 > My [YouTube](https://www.youtube.com/channel/UCWMJUmEfRC3dyJsiHrgAGXw).
 
@@ -14,7 +14,7 @@ In the `Beta` branch you can find assets that are still in development.
 1. Movements
    - Platformer
    - TopDown
-   - First Person (with multithreading)
+   - 3D (First+Third Person) Controller in one
      
 2. Object Pool
 3. Gun
@@ -23,9 +23,9 @@ In the `Beta` branch you can find assets that are still in development.
 
 ## What will happen next?
 
-- [x] = in the process of creation
+> - [x] = in the process of creation
       
 - Movements
-   - [ ] Coutch for First Person
-   - [ ] Create Third Person
+   - [x] Coutch for 3D Controller
+   - [x] Fix a bug with the camera passing through walls (third person).
 - [ ] Create all assets with Input Manager
