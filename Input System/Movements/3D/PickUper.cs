@@ -8,12 +8,12 @@ namespace Player
     public class PickUper : MonoBehaviour
     {
         [SerializeField] private float _followSpeed = 30;
-        [SerializeField] private float _trowForce = 6;
+        [SerializeField] private float _trowForce = 7;
         [SerializeField] private float _pickUpDistance = 5;
         [SerializeField] private LayerMask _canPickUpLayer;
         [Space]
         [SerializeField] private Collider _playerCollider;
-        [SerializeField] private Camera _playerCamera;
+        [SerializeField] private Transform _eyes;
         
         private InputSystem _inputSystem;
         private CancellationTokenSource _cancellationToken;
@@ -30,17 +30,10 @@ namespace Player
             _inputSystem.Player.PickUp.canceled += Drop;
             _inputSystem.Player.Trow.performed += Throw;
         }
-        
-        private void OnDestroy()
-        {
-            _inputSystem.Player.PickUp.performed -= PickUp;
-            _inputSystem.Player.PickUp.canceled -= Drop;
-            _inputSystem.Player.Trow.performed -= Throw;
-        }
 
         private void PickUp(InputAction.CallbackContext _)
         {
-            if (!Physics.Raycast(_playerCamera.transform.position, _playerCamera.transform.forward, out RaycastHit hit, _pickUpDistance, _canPickUpLayer)) return;
+            if (!Physics.Raycast(_eyes.position, _eyes.forward, out RaycastHit hit, _pickUpDistance, _canPickUpLayer)) return;
             
             _currentColliderObject = hit.collider;
             _currentRigidbodyObject = _currentColliderObject.gameObject.GetComponent<Rigidbody>();
@@ -65,7 +58,7 @@ namespace Player
             _currentRigidbodyObject.collisionDetectionMode = CollisionDetectionMode.Discrete;
             _currentRigidbodyObject.useGravity = true;
             
-            if (isThrow) _currentRigidbodyObject.AddForce(_playerCamera.transform.forward * _trowForce, ForceMode.Impulse);
+            if (isThrow) _currentRigidbodyObject.AddForce(_eyes.forward * _trowForce, ForceMode.Impulse);
 
             Physics.IgnoreCollision(_playerCollider, _currentColliderObject, false);
             _currentRigidbodyObject = null;
@@ -82,5 +75,12 @@ namespace Player
 
         private void Drop(InputAction.CallbackContext _) => Drop();
         private void Throw(InputAction.CallbackContext _) => Drop(true);
+
+        private void OnDestroy()
+        {
+            _inputSystem.Player.PickUp.performed -= PickUp;
+            _inputSystem.Player.PickUp.canceled -= Drop;
+            _inputSystem.Player.Trow.performed -= Throw;
+        }
     }
 }
