@@ -92,7 +92,7 @@ namespace Player
         }
         
         [BurstCompile]
-        struct CameraRotateCalculation : IJob
+        private struct CameraRotateCalculation : IJob
         {
             [ReadOnly] public float DeltaTime;
             [ReadOnly] public Vector2 MouseDelta;
@@ -112,7 +112,7 @@ namespace Player
         }
 
         [BurstCompile]
-        struct VelocityCalculation : IJob
+        private struct VelocityCalculation : IJob
         {
             [ReadOnly] public float WalkSpeed;
             [ReadOnly] public float RunSpeed;
