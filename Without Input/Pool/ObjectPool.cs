@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Pool
 {
-    public sealed class ObjectPool
+    public class ObjectPool
     {
         private readonly List<GameObject> _pool = new List<GameObject>();
     
